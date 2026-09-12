@@ -22,6 +22,15 @@ from datetime import date
 # Date this universe list was chosen / last deliberately edited.
 UNIVERSE_SELECTED_DATE = date(2026, 9, 12)
 
+# Log of deliberate edits to this list, most recent last. Not used by code —
+# a record for anyone reading a backtest later and asking "why this set."
+#   2026-09-12  initial 20-symbol list
+#   2026-09-12  MATIC -> POL: Polygon's token migration means MATIC/USDT
+#               stopped trading on binance 2024-09-10; POL/USDT is its
+#               continuation and has data past that date.
+#   2026-09-12  removed FLR: not listed on binance (no MATIC/POL-style
+#               continuation available on this exchange).
+
 # Base assets, quoted against USDT on the exchange configured in
 # data/ohlcv.py. Editable — but see the warning above.
 UNIVERSE: list[str] = [
@@ -34,7 +43,7 @@ UNIVERSE: list[str] = [
     "AVAX",
     "LINK",
     "DOT",
-    "MATIC",
+    "POL",
     "LTC",
     "ATOM",
     "UNI",
@@ -44,7 +53,6 @@ UNIVERSE: list[str] = [
     "ARB",
     "OP",
     "INJ",
-    "FLR",
 ]
 
 QUOTE = "USDT"

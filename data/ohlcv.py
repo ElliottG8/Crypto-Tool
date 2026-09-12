@@ -49,6 +49,20 @@ def make_exchange(exchange_id: str = "binance") -> ccxt.Exchange:
     return exchange_class({"enableRateLimit": True})
 
 
+def _drop_unclosed_candles(candles: list[list], timeframe: str, now_ms: int) -> list[list]:
+    """Drop any candle whose period has not closed yet as of now_ms.
+
+    CCXT candles are keyed by open time. A candle for a timeframe T is only
+    a complete, immutable observation once open_time + T <= now — before
+    that it's a partially-formed bar that will keep changing on every
+    subsequent fetch (lower volume, narrower range). Caching it would let
+    merge_new_candles' immutability guarantee lock in that partial bar
+    forever instead of the real closed one fetched on some later run.
+    """
+    tf_ms = TIMEFRAME_MS[timeframe]
+    return [c for c in candles if c[0] + tf_ms <= now_ms]
+
+
 def _paginate_fetch(exchange: ccxt.Exchange, symbol: str, timeframe: str, since_ms: int) -> list[list]:
     """Page forward through fetch_ohlcv from since_ms up to "now".
 
@@ -73,7 +87,10 @@ def _paginate_fetch(exchange: ccxt.Exchange, symbol: str, timeframe: str, since_
         if len(batch) < FETCH_LIMIT:
             break
 
-    return all_candles
+    # Use a fresh "now" taken after all requests completed, since pagination
+    # (and rate-limit throttling) can take real time.
+    closing_now_ms = exchange.milliseconds()
+    return _drop_unclosed_candles(all_candles, timeframe, closing_now_ms)
 
 
 def fetch_symbol(
