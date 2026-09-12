@@ -1,0 +1,21 @@
+# venv
+.venv/
+venv/
+
+# python
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# cached data
+data_cache/
+*.parquet
+*.db
+*.sqlite
+*.sqlite3
+
+# logs
+*.log
+
+# editor/OS
+.DS_Store
